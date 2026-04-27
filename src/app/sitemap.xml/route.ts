@@ -23,7 +23,7 @@ export async function GET() {
         ? new Date(post.updatedAt).toISOString()
         : now;
       return {
-        url: `${siteUrl}/posts/${post.slug}`,
+        url: `${siteUrl}/posts/${post.id}`,
         lastmod,
         priority: "0.9",
         changefreq: "monthly",

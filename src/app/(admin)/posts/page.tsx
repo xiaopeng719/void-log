@@ -58,13 +58,19 @@ export default function PostsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "—";
-    return new Date(dateString).toLocaleDateString("zh-CN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const formatDate = (dateValue: string | Date | number | null) => {
+    if (!dateValue) return "—";
+    try {
+      const d = new Date(dateValue);
+      if (isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+    } catch {
+      return "—";
+    }
   };
 
   return (
@@ -165,7 +171,7 @@ export default function PostsPage() {
                       <Link href={`/posts/edit/${post.id}`} className={styles.actionBtn} title="编辑">
                         <Edit size={16} />
                       </Link>
-                      <Link href={`/posts/${post.slug}`} className={styles.actionBtn} title="查看">
+                      <Link href={`/posts/${post.id}`} className={styles.actionBtn} title="查看" target="_blank">
                         <Eye size={16} />
                       </Link>
                       <button

@@ -73,7 +73,7 @@ export default async function HomePage() {
             {postsList.map((post, index) => (
               <Link
                 key={post.id}
-                href={`/posts/${post.slug}`}
+                href={`/posts/${post.id}`}
                 className={styles.postCard}
                 style={{ animationDelay: `${index * 100}ms` }}
               >

@@ -2,6 +2,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { jwtVerify } from "jose";
 import { FileText, MessageSquare, Eye, Clock } from "lucide-react";
+import { db } from "@/lib/db";
+import { posts, comments } from "@/lib/db/schema";
+import { eq, desc, count } from "drizzle-orm";
 import styles from "./page.module.css";
 
 const JWT_SECRET = new TextEncoder().encode(
@@ -26,22 +29,86 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  // Fetch real stats from database
+  const [totalPosts] = await db.select({ count: count() }).from(posts);
+  const [totalPublishedPosts] = await db
+    .select({ count: count() })
+    .from(posts)
+    .where(eq(posts.status, "published"));
+  const [totalComments] = await db.select({ count: count() }).from(comments);
+  const [pendingComments] = await db
+    .select({ count: count() })
+    .from(comments)
+    .where(eq(comments.status, "pending"));
+
+  // Fetch recent posts (latest 5)
+  const recentPostsData = await db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      status: posts.status,
+      createdAt: posts.createdAt,
+    })
+    .from(posts)
+    .orderBy(desc(posts.createdAt))
+    .limit(5);
+
+  // Fetch recent comments (latest 5)
+  const recentCommentsData = await db
+    .select({
+      id: comments.id,
+      postId: comments.postId,
+      authorName: comments.authorName,
+      content: comments.content,
+      status: comments.status,
+      createdAt: comments.createdAt,
+    })
+    .from(comments)
+    .orderBy(desc(comments.createdAt))
+    .limit(5);
+
+  // Fetch post titles for comment mapping
+  const allPosts = await db.select({ id: posts.id, title: posts.title }).from(posts);
+  const postTitleMap: Record<string, string> = {};
+  allPosts.forEach((p) => {
+    postTitleMap[p.id] = p.title;
+  });
+
+  // Format dates
+  const formatDate = (date: Date | null) => {
+    if (!date) return "—";
+    return new Date(date).toLocaleDateString("zh-CN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+
   const stats = [
-    { label: "文章总数", value: "12", icon: FileText, trend: "本月 +3 篇" },
-    { label: "评论总数", value: "48", icon: MessageSquare, trend: "5 条待审核" },
-    { label: "总浏览量", value: "2.4K", icon: Eye, trend: "本周 +12%" },
-    { label: "运行时间", value: "99.9%", icon: Clock, trend: "最近 30 天" },
-  ];
-
-  const recentPosts = [
-    { id: "1", title: "Next.js 15 入门指南", status: "published", date: "2026-04-20" },
-    { id: "2", title: "构建深色主题系统", status: "draft", date: "2026-04-18" },
-    { id: "3", title: "理解 TypeScript 泛型", status: "published", date: "2026-04-15" },
-  ];
-
-  const recentComments = [
-    { id: "1", author: "小明", content: "写得真好，非常有帮助！", post: "Next.js 15", status: "approved" },
-    { id: "2", author: "小红", content: "感谢分享！", post: "TypeScript 泛型", status: "pending" },
+    {
+      label: "文章总数",
+      value: String(totalPosts?.count ?? 0),
+      icon: FileText,
+      trend: `已发布 ${totalPublishedPosts?.count ?? 0} 篇`,
+    },
+    {
+      label: "评论总数",
+      value: String(totalComments?.count ?? 0),
+      icon: MessageSquare,
+      trend: `${pendingComments?.count ?? 0} 条待审核`,
+    },
+    {
+      label: "总浏览量",
+      value: "—",
+      icon: Eye,
+      trend: "暂无统计",
+    },
+    {
+      label: "运行时间",
+      value: "—",
+      icon: Clock,
+      trend: "暂无统计",
+    },
   ];
 
   return (
@@ -80,17 +147,21 @@ export default async function DashboardPage() {
             <a href="/posts" className={styles.sectionLink}>查看全部 →</a>
           </div>
           <div className={styles.list}>
-            {recentPosts.map((post) => (
-              <div key={post.id} className={styles.listItem}>
-                <div className={styles.listItemContent}>
-                  <span className={styles.listItemTitle}>{post.title}</span>
-                  <span className={styles.listItemMeta}>{post.date}</span>
+            {recentPostsData.length === 0 ? (
+              <div className={styles.empty}>暂无文章</div>
+            ) : (
+              recentPostsData.map((post) => (
+                <div key={post.id} className={styles.listItem}>
+                  <div className={styles.listItemContent}>
+                    <span className={styles.listItemTitle}>{post.title}</span>
+                    <span className={styles.listItemMeta}>{formatDate(post.createdAt)}</span>
+                  </div>
+                  <span className={`${styles.status} ${styles[`status${post.status}`]}`}>
+                    {post.status === "published" ? "已发布" : post.status === "draft" ? "草稿" : "归档"}
+                  </span>
                 </div>
-                <span className={`${styles.status} ${styles[`status${post.status}`]}`}>
-                  {post.status}
-                </span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -100,18 +171,22 @@ export default async function DashboardPage() {
             <a href="/comments" className={styles.sectionLink}>查看全部 →</a>
           </div>
           <div className={styles.list}>
-            {recentComments.map((comment) => (
-              <div key={comment.id} className={styles.listItem}>
-                <div className={styles.listItemContent}>
-                  <span className={styles.listItemTitle}>{comment.author}</span>
-                  <span className={styles.listItemText}>{comment.content}</span>
-                  <span className={styles.listItemMeta}>文章：{comment.post}</span>
+            {recentCommentsData.length === 0 ? (
+              <div className={styles.empty}>暂无评论</div>
+            ) : (
+              recentCommentsData.map((comment) => (
+                <div key={comment.id} className={styles.listItem}>
+                  <div className={styles.listItemContent}>
+                    <span className={styles.listItemTitle}>{comment.authorName}</span>
+                    <span className={styles.listItemText}>{comment.content}</span>
+                    <span className={styles.listItemMeta}>文章：{postTitleMap[comment.postId as string] || "—"}</span>
+                  </div>
+                  <span className={`${styles.status} ${styles[`status${comment.status}`]}`}>
+                    {comment.status === "approved" ? "已审核" : comment.status === "pending" ? "待审核" : comment.status}
+                  </span>
                 </div>
-                <span className={`${styles.status} ${styles[`status${comment.status}`]}`}>
-                  {comment.status}
-                </span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

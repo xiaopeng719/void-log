@@ -1,6 +1,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
+  background: var(--bg-primary);
 }
 
 /* ========================
@@ -22,7 +23,7 @@
 }
 
 .sidebarHeader {
-  padding: 1.5rem;
+  padding: 1.25rem 1.25rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -47,26 +48,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   background: var(--accent);
-  border-radius: 6px;
+  border-radius: 8px;
   color: white;
+  flex-shrink: 0;
 }
 
 .logoText {
   font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
 
 .badge {
   font-size: 0.625rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   background: var(--accent-subtle);
   color: var(--accent);
   border-radius: 4px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
+  margin-left: auto;
 }
 
 /* ========================
@@ -75,23 +78,34 @@
 
 .nav {
   flex: 1;
-  padding: 1rem;
+  padding: 1rem 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
   overflow-y: auto;
+}
+
+.navLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 0.5rem 1rem 0.25rem;
+  margin-top: 0.5rem;
 }
 
 .navItem {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 1rem;
   color: var(--text-secondary);
   text-decoration: none;
   border-radius: 8px;
   font-size: 0.875rem;
   transition: all var(--transition-fast);
+  position: relative;
 }
 
 .navItem:hover {
@@ -102,11 +116,28 @@
 .navItemActive {
   background: var(--accent-subtle);
   color: var(--accent);
+  font-weight: 500;
 }
 
-.navItemActive:hover {
-  background: var(--accent-subtle);
-  color: var(--accent);
+.navItemActive::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.navIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 /* ========================
@@ -114,11 +145,17 @@
    ======================== */
 
 .sidebarFooter {
-  padding: 1rem;
+  padding: 0.75rem;
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
+}
+
+.footerDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.25rem 0;
 }
 
 .viewSite,
@@ -126,7 +163,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 1rem;
   color: var(--text-secondary);
   text-decoration: none;
   border-radius: 8px;
@@ -154,36 +191,42 @@
   flex: 1;
   margin-left: 260px;
   min-height: 100vh;
-  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
-  padding: 2rem;
+  padding: 2rem 2.5rem;
+  flex: 1;
   max-width: 1400px;
+  width: 100%;
 }
 
 /* ========================
    Responsive
    ======================== */
 
+@media (max-width: 1280px) {
+  .content {
+    padding: 1.5rem 2rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .sidebar {
-    width: 80px;
-    min-width: 80px;
+    width: 72px;
+    min-width: 72px;
   }
 
   .sidebarHeader {
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
     padding: 1rem 0.5rem;
+    gap: 0.5rem;
   }
 
   .logoText,
-  .badge {
-    display: none;
-  }
-
+  .badge,
   .navItem span,
   .viewSite span,
   .logoutBtn span {
@@ -197,8 +240,26 @@
     padding: 0.75rem;
   }
 
+  .navItemActive::before {
+    display: none;
+  }
+
   .main {
-    margin-left: 80px;
+    margin-left: 72px;
+  }
+
+  .content {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    margin-left: 0;
   }
 
   .content {

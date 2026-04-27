@@ -1,6 +1,6 @@
 # VOID LOG — 虚空日志
 
-一个简洁优雅的个人博客系统，基于 Next.js 15 + SQLite 构建，支持文章管理、评论审核和深色主题。
+一个简洁优雅的个人博客系统，基于 Next.js 15 + SQLite 构建，支持文章管理、评论审核、多用户管理和深色主题。
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![React](https://img.shields.io/badge/React-19-blue)
@@ -13,8 +13,10 @@
 - 💬 **评论系统** — 访客评论 + 管理员审核
 - 🎨 **深色主题** — 自动跟随系统主题
 - 🔐 **管理员后台** — 仪表盘、文章管理、评论审核、站点设置
+- 👥 **多用户管理** — 添加/编辑/删除账户，修改密码（设置页面）
 - 📱 **响应式设计** — 适配桌面端和移动端
-- 🌐 **RSS 订阅** — 自动生成 RSS Feed
+- 🌐 **RSS 订阅** — 自动生成 RSS Feed (`/rss.xml`)
+- 📋 **站点地图** — 自动生成 sitemap.xml (`/sitemap.xml`)
 
 ## 🛠️ 技术栈
 
@@ -40,7 +42,7 @@
 
 ```bash
 # 克隆仓库
-git clone <your-repo-url>
+git clone https://github.com/xiaopeng719/void-log.git
 cd void-log
 
 # 安装依赖
@@ -70,41 +72,50 @@ npm start
 - **邮箱**: admin@voidlog.com
 - **密码**: voidlog2026
 
-> ⚠️ 建议首次登录后在后台修改密码。
+> ⚠️ 建议首次登录后在「设置」→「账户管理」中修改密码。
 
 ## 📁 项目结构
 
 ```
 void-log/
 ├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── (admin)/           # 管理后台路由组
-│   │   │   ├── layout.tsx     # 管理员布局（含侧边栏）
-│   │   │   ├── dashboard/     # 仪表盘
-│   │   │   ├── posts/         # 文章管理
-│   │   │   ├── comments/      # 评论审核
-│   │   │   ├── settings/      # 站点设置
-│   │   │   └── styles/        # 样式管理
-│   │   ├── api/               # API 路由
-│   │   │   ├── auth/login/    # 登录接口
-│   │   │   ├── posts/         # 文章 CRUD
-│   │   │   ├── comments/      # 评论 CRUD
-│   │   │   └── styles/        # 样式 API
-│   │   ├── login/             # 登录页
-│   │   ├── page.tsx           # 首页
-│   │   └── layout.tsx         # 根布局
-│   ├── components/             # React 组件
-│   │   ├── admin/             # 管理后台组件
-│   │   ├── blog/              # 博客公共组件
-│   │   └── CommentSection.tsx # 评论组件
-│   └── lib/                   # 工具库
-│       ├── auth.ts            # NextAuth v4 配置
-│       └── db.ts              # Drizzle ORM 配置
-├── data/                      # SQLite 数据库文件
-│   └── void-log.db
-├── public/                    # 静态资源
-├── .env                       # 环境变量（不上传）
-├── next.config.js             # Next.js 配置
+│   ├── app/
+│   │   ├── (admin)/              # 管理后台路由组
+│   │   │   ├── dashboard/        # 仪表盘（真实数据统计）
+│   │   │   ├── posts/            # 文章列表 / 新建 / 编辑
+│   │   │   ├── comments/          # 评论审核
+│   │   │   ├── settings/          # 站点设置 + 账户管理
+│   │   │   └── styles/            # 样式管理
+│   │   ├── api/                   # API 路由
+│   │   │   ├── auth/
+│   │   │   │   ├── login/         # POST 登录
+│   │   │   │   ├── me/            # GET 当前用户
+│   │   │   │   └── [...nextauth]/ # NextAuth v4
+│   │   │   ├── users/             # 用户 CRUD
+│   │   │   ├── posts/             # 文章 CRUD
+│   │   │   ├── comments/          # 评论 CRUD
+│   │   │   ├── styles/            # 样式 CRUD
+│   │   │   └── settings/          # 设置 CRUD
+│   │   ├── login/                 # 登录页
+│   │   ├── posts/[id]/            # 公开文章页（按 ID 而非 slug）
+│   │   ├── rss.xml/               # RSS Feed
+│   │   ├── sitemap.xml/            # 站点地图
+│   │   ├── page.tsx               # 首页
+│   │   └── layout.tsx             # 根布局
+│   ├── components/
+│   │   ├── admin/                 # 管理后台组件
+│   │   └── public/                # 公共组件（含评论组件）
+│   └── lib/
+│       ├── auth.ts                # NextAuth v4 配置
+│       ├── db/                    # Drizzle ORM + SQLite
+│       │   ├── index.ts           # 数据库连接
+│       │   └── schema.ts          # 表结构定义
+│       └── utils.ts               # 工具函数
+├── data/
+│   └── void-log.db                # SQLite 数据库文件
+├── public/                        # 静态资源
+├── .env                           # 环境变量（不提交）
+├── next.config.js
 ├── package.json
 └── tsconfig.json
 ```
@@ -114,7 +125,7 @@ void-log/
 ```bash
 # .env.local
 
-# NextAuth 密钥（必填，生成随机字符串）
+# JWT 签名密钥（必填，建议使用 32+ 字符随机字符串）
 AUTH_SECRET=your-random-secret-here
 
 # 站点 URL（生产环境必填）
@@ -131,6 +142,17 @@ AUTH_TRUST_HOST=1
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | POST | `/api/auth/login` | 登录，返回 JWT cookie |
+| GET | `/api/auth/me` | 获取当前登录用户信息 |
+
+### 用户管理
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/users` | 获取所有用户列表 |
+| POST | `/api/users` | 创建新用户 |
+| GET | `/api/users/[id]` | 获取单个用户信息 |
+| PUT | `/api/users/[id]` | 更新用户信息（含密码修改） |
+| DELETE | `/api/users/[id]` | 删除用户 |
 
 ### 文章
 
@@ -151,12 +173,19 @@ AUTH_TRUST_HOST=1
 | PUT | `/api/comments/[id]` | 审核评论 |
 | DELETE | `/api/comments/[id]` | 删除评论 |
 
+### 设置
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/settings` | 获取所有设置 |
+| PUT | `/api/settings` | 更新设置 |
+
 ## 🔐 安全说明
 
-- 密码使用 **bcryptjs** 哈希存储
-- 会话使用 **JWT**（jose 签发），存储在 HttpOnly Cookie 中
-- 管理后台路由受中间件保护
-- 数据库文件存储在本地，非云端
+- 密码使用 **bcryptjs** 哈希存储（加盐，10 轮）
+- 会话使用 **JWT**（HS256 签名），存储在 HttpOnly + SameSite=Lax Cookie 中
+- 管理后台所有路由受中间件保护，未登录访问自动跳转登录页
+- 删除用户前需二次确认（防误删）
 
 ## 🎨 自定义主题
 

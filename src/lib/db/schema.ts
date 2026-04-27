@@ -12,11 +12,11 @@ export const posts = sqliteTable("posts", {
   status: text("status", { enum: ["draft", "published", "archived"] })
     .default("draft")
     .notNull(),
-  publishedAt: integer("published_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" })
+  publishedAt: integer("published_at", { mode: "timestamp_ms" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
     .$defaultFn(() => new Date())
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .$defaultFn(() => new Date())
     .notNull(),
 });

@@ -7,11 +7,11 @@ import { eq, and } from "drizzle-orm";
 import CommentSection from "@/components/public/CommentSection";
 import styles from "./page.module.css";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   
   const post = await db.query.posts.findFirst({
-    where: eq(posts.slug, slug),
+    where: eq(posts.id, id),
   });
   
   if (!post) return { title: "文章未找到" };
@@ -22,11 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   
   const post = await db.query.posts.findFirst({
-    where: eq(posts.slug, slug),
+    where: eq(posts.id, id),
   });
 
   if (!post || post.status !== "published") {

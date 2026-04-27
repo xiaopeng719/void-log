@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import styles from "./layout.module.css";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.AUTH_SECRET || "fallback-secret-change-me"
@@ -30,11 +31,13 @@ export default async function AdminLayout({
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className={styles.layout}>
       <AdminSidebar />
-      <main style={{ flex: 1, marginLeft: "260px", padding: "2rem" }}>
-        {children}
-      </main>
+      <div className={styles.main}>
+        <div className={styles.content}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

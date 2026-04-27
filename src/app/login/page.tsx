@@ -43,9 +43,19 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.stars} />
       <div className={styles.card}>
+        <div className={styles.logoArea}>
+          <div className={styles.logoIcon}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+              <path d="M2 12h20"/>
+            </svg>
+          </div>
+        </div>
         <h1 className={styles.title}>虚空日志</h1>
-        <p className={styles.subtitle}>管理后台</p>
+        <p className={styles.subtitle}>管理员登录</p>
 
         <div className={styles.form}>
           <div className={styles.field}>
@@ -57,6 +67,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@voidlog.com"
+              autoComplete="email"
             />
           </div>
 
@@ -69,6 +80,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              autoComplete="current-password"
+              onKeyDown={(e) => e.key === "Enter" && doLogin()}
             />
           </div>
 

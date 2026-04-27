@@ -65,7 +65,7 @@ export default function NewPostPage() {
       if (!res.ok) throw new Error("创建文章失败");
 
       const post = await res.json();
-      router.push(`/posts/${post.id}/edit`);
+      router.push(`/posts/edit/${post.id}`);
     } catch (error) {
       console.error("Error creating post:", error);
       alert("创建文章失败，请重试。");

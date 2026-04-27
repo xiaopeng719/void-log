@@ -1,21 +1,22 @@
 .sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
   width: 260px;
-  height: 100vh;
+  min-width: 260px;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
   z-index: 100;
 }
 
 .sidebarHeader {
-  padding: 1.5rem;
+  padding: 1.25rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -25,17 +26,30 @@
   gap: 0.5rem;
   text-decoration: none;
   color: var(--text-primary);
+  transition: opacity var(--transition-fast);
+}
+
+.logo:hover {
+  opacity: 0.8;
+  color: var(--text-primary);
 }
 
 .logoIcon {
-  color: var(--accent);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  color: white;
+  flex-shrink: 0;
 }
 
 .logoText {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.08em;
 }
 
 .badge {
@@ -44,29 +58,36 @@
   letter-spacing: 0.1em;
   color: var(--accent);
   background: rgba(99, 102, 241, 0.15);
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 4px;
+  margin-left: auto;
 }
+
+/* ========================
+   Navigation
+   ======================== */
 
 .nav {
   flex: 1;
   padding: 1rem 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
+  overflow-y: auto;
 }
 
 .navItem {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 1rem;
   border-radius: 8px;
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
   transition: all var(--transition-fast);
+  position: relative;
 }
 
 .navItem:hover {
@@ -84,8 +105,24 @@
   background: rgba(99, 102, 241, 0.15);
 }
 
+.navItemActive::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ========================
+   Sidebar Footer
+   ======================== */
+
 .sidebarFooter {
-  padding: 1rem 0.75rem;
+  padding: 0.75rem;
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -96,7 +133,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 1rem;
   border-radius: 8px;
   color: var(--text-secondary);
   text-decoration: none;
@@ -114,7 +151,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 1rem;
   border-radius: 8px;
   color: var(--text-secondary);
   font-size: 0.875rem;
@@ -125,6 +162,7 @@
   width: 100%;
   text-align: left;
   transition: all var(--transition-fast);
+  font-family: var(--font-mono);
 }
 
 .logoutBtn:hover {

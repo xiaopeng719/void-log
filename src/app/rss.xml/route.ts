@@ -24,7 +24,7 @@ export async function GET() {
         const pubDate = post.publishedAt
           ? new Date(post.publishedAt).toUTCString()
           : new Date().toUTCString();
-        const postUrl = `${siteUrl}/posts/${post.slug}`;
+        const postUrl = `${siteUrl}/posts/${post.id}`;
         const excerpt = post.excerpt || "";
         const content = post.content || "";
 
